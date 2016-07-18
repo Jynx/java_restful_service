@@ -11,16 +11,14 @@ public class HibernateUtility {
     private static SessionFactory sessionFactory;
 
     private static SessionFactory buildSessionFactory() {
-            final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                    .configure() // configures settings from hibernate.cfg.xml
-                    .build();
-            try {
-                sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-            }
-            catch (Exception e) {
-                StandardServiceRegistryBuilder.destroy(registry);
-            }
-            return sessionFactory;
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+        try {
+            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        }
+        catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
+        return sessionFactory;
     }
 
     public static SessionFactory getSessionFactory() {
