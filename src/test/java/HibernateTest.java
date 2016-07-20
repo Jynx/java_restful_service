@@ -23,6 +23,7 @@ public class HibernateTest {
         session.beginTransaction();
     }
 
+
     @Test
     public void returnsMatchingUsers() {
         User testUser =  new User("test1", "test2", "test3");
