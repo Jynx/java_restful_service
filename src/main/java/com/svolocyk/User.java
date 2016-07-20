@@ -12,14 +12,14 @@ import javax.persistence.*;
 
 @NamedNativeQueries({
     @NamedNativeQuery(
-            name = "deleteUserByID",
-            query = "delete from rest_user ru where ru.user_id = :user_id",
-            resultClass = User.class ),
+        name = "deleteUserByID",
+        query = "delete from rest_user ru where ru.user_id = :user_id",
+        resultClass = User.class ),
 
     @NamedNativeQuery (
-            name = "selectUserByID",
-            query = "select * from rest_user ru where ru.user_id = :user_id",
-            resultClass = User.class )
+        name = "selectUserByID",
+        query = "select * from rest_user ru where ru.user_id = :user_id",
+        resultClass = User.class )
 
 })
 

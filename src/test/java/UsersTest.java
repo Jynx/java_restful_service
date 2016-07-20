@@ -26,7 +26,7 @@ public class UsersTest {
 
     @After
     public void after(){
-
+        deleteTestUser();
     }
 
     @Test
@@ -108,6 +108,9 @@ public class UsersTest {
     }
 
     private void deleteTestUser() {
+        if(!session.isOpen()) {
+            session = HibernateUtility.getSessionFactory().openSession();
+        }
         Query query = session.getNamedQuery("deleteUserByID");
         query.setParameter("user_id", testUser.getUserId());
         session.beginTransaction();
