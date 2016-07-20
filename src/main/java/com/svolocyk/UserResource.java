@@ -24,6 +24,9 @@ public class UserResource {
         }
         List<?> list = getUserListForId(session, userId);
         User user = (User)list.get(0);
+        //fix this
+        List<Group> groups = getGroupsForUser(user, session);
+        user.setGroups(groups);
         return Response.status(Response.Status.FOUND).entity(user).build();
     }
 
@@ -41,7 +44,9 @@ public class UserResource {
         }
         user.setUserId(userId);
         session.beginTransaction();
-        session.save(user);
+        int id = (int)session.save(user);
+        user.setId(id);
+        persistGroupsForUser(user, session);
         session.getTransaction().commit();
         session.close();
         return Response.status(Response.Status.CREATED).entity(user).build();
@@ -56,12 +61,19 @@ public class UserResource {
         if(!userExists(userId, session)) {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for UserId: " + userId).build();
         }
+        //clean this up? DONT DELETE GROUPS TIRED YOU
         List<?> list = getUserListForId(session, userId);
         User user = (User)list.get(0);
+        deleteGroupMappingsForUser(user, session);
+
         user.setFirstName(putUser.getFirstName());
         user.setLastName(putUser.getLastName());
+        user.setGroups(putUser.getGroups());
         session.beginTransaction();
         session.update(user);
+
+        //fix this
+        persistGroupsForUser(user, session);
         session.getTransaction().commit();
         session.close();
         return Response.status(Response.Status.OK).entity(user).build();
@@ -83,6 +95,32 @@ public class UserResource {
         return Response.status(Response.Status.OK).build();
     }
 
+    private List<Group> getGroupsForUser(User user, Session session) {
+        Query query = session.getNamedQuery("getGroupsForUserFromMapping");
+        query.setParameter("id", user.getId());
+        return query.list();
+    }
+
+    private void persistGroupsForUser(User user, Session session) {
+        for (Group group: user.getGroups()) {
+            if(!groupExists(group.getGroupName(), session)) {
+                Group newGroup = new Group(group.getGroupName());
+                session.save(newGroup);
+            }
+            UserGroupMapping mapping = new UserGroupMapping(group.getGroupName(), user.getUserId(), user.getId());
+            session.save(mapping);
+        }
+    }
+
+    private boolean groupExists(String groupName, Session session) {
+        Query query = session.getNamedQuery("selectGroupByName");
+        query.setParameter("group_name", groupName);
+        if(query.list().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     private boolean userExists(String userId, Session session) {
         if(!getUserListForId(session, userId).isEmpty()) {
             return true;
@@ -95,5 +133,22 @@ public class UserResource {
         query.setParameter("user_id", userId);
         return query.list();
     }
+
+    private void deleteGroupMappingsForUser(User user, Session session) {
+        session.beginTransaction();
+        Query query = session.getNamedQuery("deleteGroupUserMappingsForUser");
+        query.setParameter("id", user.getId());
+        query.executeUpdate();
+        session.getTransaction().commit();
+    }
+
+//    private void deleteGroupsForUser(User user, Session session) {
+//        for(Group group : user.getGroups()) {
+//            Query query = session.getNamedQuery("deleteGroupByName");
+//            query.setParameter("group_name", group.getGroupName());
+//            query.executeUpdate();
+//            session.getTransaction().commit();
+//        }
+//    }
 
 }

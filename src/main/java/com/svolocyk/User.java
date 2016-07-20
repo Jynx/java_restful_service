@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -19,7 +20,17 @@ import javax.persistence.*;
     @NamedNativeQuery (
         name = "selectUserByID",
         query = "select * from rest_user ru where ru.user_id = :user_id",
-        resultClass = User.class )
+        resultClass = User.class ),
+
+    @NamedNativeQuery (
+        name = "getGroupsForUserFromMapping",
+        query = "select group_name from rest_user_group_mapping rugm where rugm.user_unique_id = :id",
+        resultClass = UserGroupMapping.class ),
+
+    @NamedNativeQuery (
+        name = "deleteGroupUserMappingsForUser",
+        query = "delete from rest_user_group_mapping rugm where rugm.user_unique_id = :id",
+        resultClass = Group.class )
 
 })
 
@@ -34,6 +45,7 @@ public class User implements Serializable{
     @Column(name = "last_name")
     private String lastName;
 
+    @JsonProperty("userid")
     @Column(name = "user_id")
     private String userId;
 
@@ -43,12 +55,17 @@ public class User implements Serializable{
     @Column(name = "id")
     private int id;
 
+    @Transient
+    @JsonProperty("groups")
+    private List<Group> groups;
+
     public User(){}
 
-    public User(String firstName, String lastName, String userId) {
+    public User(String firstName, String lastName, String userId, List<Group> groups) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.userId = userId;
+        this.groups = groups;
     }
 
     public String getFirstName() {return firstName;
@@ -77,6 +94,14 @@ public class User implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     @Override

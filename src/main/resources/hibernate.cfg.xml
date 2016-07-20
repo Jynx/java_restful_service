@@ -12,5 +12,6 @@
         <property name="show_sql">true</property>
         <mapping class="com.svolocyk.User"/>
         <mapping class="com.svolocyk.Group"/>
+        <mapping class="com.svolocyk.UserGroupMapping"/>
     </session-factory>
 </hibernate-configuration >
