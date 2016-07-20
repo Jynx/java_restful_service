@@ -33,7 +33,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postUser(@PathParam("id") String userId, User user) {
         if (!user.getUserId().equals(userId)) {
-            Response.status(Response.Status.CONFLICT).entity("UserId of URI and provider user do not match.").build();
+            return Response.status(Response.Status.CONFLICT).entity("UserId of URI and provider user do not match.").build();
         }
         Session session = HibernateUtility.getSessionFactory().openSession();
         if(userExists(userId, session)) {
@@ -77,7 +77,7 @@ public class UserResource {
         Query query = session.getNamedQuery("deleteUserByID");
         query.setParameter("user_id", userId);
         session.beginTransaction();
-        int result = query.executeUpdate();
+        query.executeUpdate();
         session.getTransaction().commit();
         session.close();
         return Response.status(Response.Status.OK).build();
