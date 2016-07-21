@@ -4,6 +4,7 @@ import org.hibernate.query.Query;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
@@ -29,22 +30,21 @@ public class UsersTest {
     }
 
     @After
-    public void after(){
+    public void after() {
         deleteTestUser();
-//        session.close();
     }
 
     @Test
     public void testGetNonExistentUser() {
-        Response response =  userResource.getUser("ThisWontExistInDB");
+        Response response = userResource.getUser("ThisWontExistInDB");
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.NOT_FOUND.getReasonPhrase());
     }
 
     @Test
     public void testGetExistingUser() {
         persistTestUser();
-        Response response =  userResource.getUser(testUser.getUserId());
-        User retrievedUser = (User)response.getEntity();
+        Response response = userResource.getUser(testUser.getUserId());
+        User retrievedUser = (User) response.getEntity();
         deleteTestUser();
         assertEquals(retrievedUser.getUserId(), testUser.getUserId());
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.FOUND.getReasonPhrase());
@@ -60,21 +60,21 @@ public class UsersTest {
 
     @Test
     public void testPostUserMissMatchedUserID() {
-        Response response =  userResource.postUser("IdThatWontMatchTestUser.getUserId", testUser);
+        Response response = userResource.postUser("IdThatWontMatchTestUser.getUserId", testUser);
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.CONFLICT.getReasonPhrase());
     }
 
     @Test
     public void testSuccessfulPostUser() {
         deleteTestUser();
-        Response response =  userResource.postUser(testUser.getUserId(), testUser);
+        Response response = userResource.postUser(testUser.getUserId(), testUser);
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.CREATED.getReasonPhrase());
     }
 
     @Test
     public void testPutUserDoesNotExist() {
         deleteTestUser();
-        Response response =  userResource.putUser(testUser.getUserId(), testUser);
+        Response response = userResource.putUser(testUser.getUserId(), testUser);
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.NOT_FOUND.getReasonPhrase());
     }
 
@@ -82,9 +82,9 @@ public class UsersTest {
     public void testPutUserExists() {
         persistTestUser();
         User changeUser = new User("firstNameChanged", "lastName", "fLast", groups);
-        Response response =  userResource.putUser(testUser.getUserId(), changeUser);
+        Response response = userResource.putUser(testUser.getUserId(), changeUser);
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.OK.getReasonPhrase());
-        User returnedUser = (User)response.getEntity();
+        User returnedUser = (User) response.getEntity();
         assertEquals(changeUser.getFirstName(), returnedUser.getFirstName());
         deleteTestUser();
     }
@@ -92,24 +92,24 @@ public class UsersTest {
     @Test
     public void testDeleteUserDoesNotExist() {
         deleteTestUser();
-        Response response =  userResource.deleteUser(testUser.getUserId());
+        Response response = userResource.deleteUser(testUser.getUserId());
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.NOT_FOUND.getReasonPhrase());
     }
 
     @Test
     public void testDeleteUserExists() {
         persistTestUser();
-        Response response =  userResource.deleteUser(testUser.getUserId());
+        Response response = userResource.deleteUser(testUser.getUserId());
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.OK.getReasonPhrase());
         deleteTestUser();
     }
 
     private void persistTestUser() {
-        if(!session.isOpen()) {
+        if (!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
         session.beginTransaction();
-        int id = (int)session.save(testUser);
+        int id = (int) session.save(testUser);
         testUser.setId(id);
         persistGroupsForUser(testUser, session);
         session.getTransaction().commit();
@@ -117,15 +117,15 @@ public class UsersTest {
 
     private void persistGroupsForUser(User user, Session session) {
         int batchCount = 0;
-        for (Group group: user.getGroups()) {
-            if(!HibernateUtility.groupExists(group.getGroupName(), session)) {
+        for (Group group : user.getGroups()) {
+            if (!HibernateUtility.groupExists(group.getGroupName(), session)) {
                 Group newGroup = new Group(group.getGroupName());
                 session.save(newGroup);
             }
             UserGroupMapping mapping = new UserGroupMapping(group.getGroupName(), user.getUserId(), user.getId());
             session.save(mapping);
             batchCount++;
-            if(batchCount % 20 == 0) {
+            if (batchCount % 20 == 0) {
                 session.flush();
                 session.clear();
             }
@@ -145,25 +145,25 @@ public class UsersTest {
 
 
     private void deleteUser() {
-        Query query = session.getNamedQuery("deleteUserByID");
-        query.setParameter("user_id", testUser.getUserId());
+        Query query = session.getNamedQuery(User.DELETE_USER_BY_USERID);
+        query.setParameter(User.USER_ID_PARAMETER, testUser.getUserId());
         query.executeUpdate();
     }
 
     private void deleteTestGroupUserMappingsForUser() {
-        Query query = session.getNamedQuery("deleteGroupUserMappingsForUser");
-        query.setParameter("id", testUser.getUserId());
+        Query query = session.getNamedQuery(User.DELETE_GROUP_USER_MAPPINGS_FOR_USER);
+        query.setParameter(User.USER_ID_PARAMETER, testUser.getUserId());
         query.executeUpdate();
     }
 
     private void deleteTestGroupsForUser() {
         int batchCount = 0;
-        for(Group group : testUser.getGroups()) {
-            Query query = session.getNamedQuery("deleteGroupByName");
-            query.setParameter("group_name", group.getGroupName());
+        for (Group group : testUser.getGroups()) {
+            Query query = session.getNamedQuery(Group.DELETE_GROUP_BY_NAME);
+            query.setParameter(Group.GROUP_NAME_PARAMETER, group.getGroupName());
             query.executeUpdate();
             batchCount++;
-            if(batchCount % 20 == 0) {
+            if (batchCount % 20 == 0) {
                 session.flush();
                 session.clear();
             }

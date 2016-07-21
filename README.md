@@ -12,27 +12,8 @@ URI path                                | Resource class      | HTTP methods    
 **_/users/{userid}_**                   |  UserResource       |  GET, POST, PUT, DELETE                               |  Returns, Creates, Deletes, or Updates a User Record.
 **_/groups/{group name}_**              |  GroupResource      |  GET, POST, PUT, DELETE                               |  Returns a JSON list of Users, Creates, Updates, or Deletes Group records.
 
-Running the Example
--------------------
-
-
-STATUS: App complete and functional. Refactoring now.
-
--- Updates to come.
-
-
-
-=========================================================
-
-
-chef-starter-project
-=================
-
-Chef Starter project
-
 Description
 ------------
-Implement a REST service to store, fetch, and update user records. A user record is a JSON hash like so:
 
 ```
 {"first_name": "Joe",
@@ -65,12 +46,11 @@ Updates the membership list for the group. The body of the request should be a J
 ```DELETE /groups/<group name>```
 Removes all members from the named group. Should return a 404 for unknown groups.
 
-Implementation Notes
---------------------
-Acceptable implementation languages are Java, Ruby, Erlang, JavaScript, and Intercal.
+SETUP
+-------------------
 
-Any design decisions not specified herein are fair game. Completed projects will be evaluated on how closely they follow the spec, their design, and cleanliness of implementation.
 
-Completed projects must include a README with enough instructions for evaluators to build and run the code. Bonus points for builds which require minimal manual steps.
 
-Remember this project should take a maximum of 8 hours to complete. Do not get hung up on scaling or persistence issues. This is a project used to evaluate your design and coding skills only.
+=========================================================
+
+

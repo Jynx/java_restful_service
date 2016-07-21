@@ -11,53 +11,75 @@ import javax.persistence.*;
  */
 
 @NamedNativeQueries({
-    @NamedNativeQuery(
-        name = "deleteGroupByName",
-        query = "delete from rest_group rg where rg.group_name = :group_name",
-        resultClass = Group.class),
+        @NamedNativeQuery(
+                name = Group.DELETE_GROUP_BY_NAME,
+                query = "delete from " + HibernateUtility.REST_GROUP_TABLE
+                        + " rg where rg." + Group.GROUP_NAME_COLUMN + " = :" + Group.GROUP_NAME_PARAMETER,
+                resultClass = Group.class),
 
-    @NamedNativeQuery (
-        name = "selectGroupByName",
-        query = "select * from rest_group rg where rg.group_name = :group_name",
-        resultClass = Group.class),
+        @NamedNativeQuery(
+                name = Group.SELECT_GROUP_BY_NAME,
+                query = "select * from " + HibernateUtility.REST_GROUP_TABLE + " rg where rg."
+                        + Group.GROUP_NAME_COLUMN + " = :" + Group.GROUP_NAME_PARAMETER,
+                resultClass = Group.class),
 
-    @NamedNativeQuery (
-        name = "deleteGroupUserMapping",
-        query = "delete from rest_user_group_mapping rugp where rugp.group_name = :group_name",
-        resultClass = UserGroupMapping.class),
+        @NamedNativeQuery(
+                name = Group.DELETE_USER_GROUP_MAPPING,
+                query = "delete from " + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE
+                        + " rugp where rugp." + Group.GROUP_NAME_COLUMN + " = :" + Group.GROUP_NAME_PARAMETER,
+                resultClass = UserGroupMapping.class),
 
-    @NamedNativeQuery (
-        name = "persistTestGroupUserMapping",
-        query = "insert into rest_user_group_mapping values('999', 'testGroup', 'testUser', 00)",
-        resultClass = UserGroupMapping.class),
+        @NamedNativeQuery(
+                name = Group.PERSIST_TEST_USER_GROUP_MAPPING,
+                query = "insert into " + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE
+                        + " values('999', 'testGroup', 'testUser', 00)",
+                resultClass = UserGroupMapping.class),
 
-    @NamedNativeQuery (
-        name = "selectGroupUserMappingByName",
-        query = "select * from rest_user_group_mapping rugp where rugp.group_name = :group_name",
-        resultClass = UserGroupMapping.class),
+        @NamedNativeQuery(
+                name = Group.SELECT_USER_GROUP_MAPPING_BY_NAME,
+                query = "select * from " + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE
+                        + " rugp where rugp." + Group.GROUP_NAME_COLUMN + " = :" + Group.GROUP_NAME_PARAMETER,
+                resultClass = UserGroupMapping.class),
 
-    @NamedNativeQuery (
-        name = "checkForExistingUserAndGroupMappingByUserIdAndGroupName",
-        query = "select * from rest_user_group_mapping rugp where rugp.group_name = :group_name and rugp.user_id = :user_id",
-        resultClass = UserGroupMapping.class)
+        @NamedNativeQuery(
+                name = Group.CHECK_EXISTING_USER_GROUP_MAPPING_BY_ID_GROUP,
+                query = "select * from " + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE + " rugp where rugp."
+                        + Group.GROUP_NAME_COLUMN + " = :" + Group.GROUP_NAME_PARAMETER + " and rugp." + Group.USER_ID_COLUMN + " = :" + Group.USER_ID_PARAMETER,
+                resultClass = UserGroupMapping.class)
 
 })
 
 @Entity
-@Table(name = "rest_group")
+@Table(name = HibernateUtility.REST_GROUP_TABLE)
 public class Group {
+
+    public static final String DELETE_GROUP_BY_NAME = "deleteGroupByName";
+    public static final String SELECT_GROUP_BY_NAME = "selectGroupByName";
+    public static final String DELETE_USER_GROUP_MAPPING = "deleteGroupUserMapping";
+    public static final String PERSIST_TEST_USER_GROUP_MAPPING = "persistTestGroupUserMapping";
+    public static final String SELECT_USER_GROUP_MAPPING_BY_NAME = "selectUserGroupMappingByName";
+    public static final String CHECK_EXISTING_USER_GROUP_MAPPING_BY_ID_GROUP = "checkExistingUserGroupMappingByIdGroup";
+
+    public static final String GROUP_NAME_COLUMN = "group_name";
+    public static final String USER_ID_COLUMN = "user_id";
+    public static final String UNIQUE_GROUP_ID_COLUMN = "id";
+
+    public static final String GROUP_NAME_PARAMETER = "group_name";
+    public static final String USER_ID_PARAMETER = "user_id";
+
     @Id
     @JsonIgnore
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
-    @Column(name = "id")
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
+    @Column(name = UNIQUE_GROUP_ID_COLUMN)
     private int id;
 
     @JsonProperty("group")
-    @Column(name ="group_name")
+    @Column(name = GROUP_NAME_COLUMN)
     private String groupName;
 
-    public Group(){}
+    public Group() {
+    }
 
     public Group(String groupName) {
         this.groupName = groupName;
@@ -80,7 +102,7 @@ public class Group {
     }
 
     @Override
-    public String toString(){
-        return new StringBuffer("Group Name: "). append(this.groupName).toString();
+    public String toString() {
+        return "Group Name: " + this.groupName;
     }
 }

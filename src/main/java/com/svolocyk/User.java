@@ -13,58 +13,76 @@ import javax.persistence.*;
  */
 
 @NamedNativeQueries({
-    @NamedNativeQuery(
-        name = "deleteUserByID",
-        query = "delete from rest_user ru where ru.user_id = :user_id",
-        resultClass = User.class ),
+        @NamedNativeQuery(
+                name = User.DELETE_USER_BY_USERID,
+                query = "delete from " + HibernateUtility.REST_USER_TABLE + " ru where ru." +
+                        User.USER_ID_COLUMN + "= :" + User.USER_ID_PARAMETER,
+                resultClass = User.class),
 
-    @NamedNativeQuery (
-        name = "selectUserByID",
-        query = "select * from rest_user ru where ru.user_id = :user_id",
-        resultClass = User.class ),
+        @NamedNativeQuery(
+                name = User.SELECT_USER_BY_USERID,
+                query = "select * from " + HibernateUtility.REST_USER_TABLE + " ru where ru." +
+                        User.USER_ID_COLUMN + "= :" + User.USER_ID_PARAMETER,
+                resultClass = User.class),
 
-    @NamedNativeQuery (
-        name = "deleteGroupUserMappingsForUser",
-        query = "delete from rest_user_group_mapping rugm where rugm.user_id = :id",
-        resultClass = Group.class ),
+        @NamedNativeQuery(
+                name = User.DELETE_GROUP_USER_MAPPINGS_FOR_USER,
+                query = "delete from " + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE +
+                        " rugm where rugm." + User.USER_ID_COLUMN + "= :" + User.USER_ID_PARAMETER,
+                resultClass = UserGroupMapping.class),
 
-    @NamedNativeQuery (
-        name = "getGroupsForUserFromMapping",
-        query = "SELECT * " +
-                "FROM         rest_group rg " +
-                "INNER JOIN   rest_user_group_mapping rugm " +
-                "ON           rg.group_name = rugm.group_name " +
-                "WHERE        rugm.user_id = :id",
-        resultClass = Group.class )
+        @NamedNativeQuery(
+                name = User.GET_GROUPS_FOR_USER_FROM_MAPPING,
+                query = "SELECT * " +
+                        "FROM "           + HibernateUtility.REST_GROUP_TABLE + " rg " +
+                        "INNER JOIN "     + HibernateUtility.REST_USER_GROUP_MAPPING_TABLE + " rugm " +
+                        "ON          rg." + Group.GROUP_NAME_COLUMN + " = rugm." + Group.GROUP_NAME_COLUMN +
+                        " WHERE    rugm."  + User.USER_ID_COLUMN + " = :" + User.USER_ID_PARAMETER,
+                resultClass = Group.class)
 })
 
 @Entity
-@Table(name = "rest_user")
-public class User implements Serializable{
-    @Column(name = "first_name")
+@Table(name = HibernateUtility.REST_USER_TABLE)
+public class User {
+
+    public static final String DELETE_USER_BY_USERID = "deleteUserByUID";
+    public static final String SELECT_USER_BY_USERID = "selectUserByUID";
+    public static final String DELETE_GROUP_USER_MAPPINGS_FOR_USER = "deleteGroupUserMappingsForUser";
+    public static final String GET_GROUPS_FOR_USER_FROM_MAPPING = "getGroupsForUserFromMapping";
+
+    public static final String FIRST_NAME_COLUMN = "first_name";
+    public static final String LAST_NAME_COLUMN = "last_name";
+    public static final String USER_ID_COLUMN = "user_id";
+    public static final String UNIQUE_ID_COLUMN = "id";
+
+    public static final String GROUP_NAME_PARAMETER = "group_name";
+    public static final String USER_ID_PARAMETER = "user_id";
+
     @JsonProperty("first_name")
+    @Column(name = FIRST_NAME_COLUMN)
     private String firstName;
 
     @JsonProperty("last_name")
-    @Column(name = "last_name")
+    @Column(name = LAST_NAME_COLUMN)
     private String lastName;
 
     @JsonProperty("userid")
-    @Column(name = "user_id")
+    @Column(name = USER_ID_COLUMN)
     private String userId;
 
     @Id
     @JsonIgnore
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
-    @Column(name = "id")
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
+    @Column(name = UNIQUE_ID_COLUMN)
     private int id;
 
     @Transient
     @JsonProperty("groups")
     private List<Group> groups;
 
-    public User(){}
+    public User() {
+    }
 
     public User(String firstName, String lastName, String userId, List<Group> groups) {
         this.firstName = firstName;
@@ -73,20 +91,24 @@ public class User implements Serializable{
         this.groups = groups;
     }
 
-    public String getFirstName() {return firstName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirstName(String firstName) { this.firstName = firstName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLastName() { return lastName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLastName(String lastName) { this.lastName = lastName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUserId() {
-         return this.userId;
+        return this.userId;
     }
 
     public void setUserId(String userId) {
@@ -110,8 +132,7 @@ public class User implements Serializable{
     }
 
     @Override
-    public String toString(){
-        return new StringBuffer("First Name: "). append(this.firstName).append("Last Name: ").append("UserID: ")
-                .append(this.userId).toString();
+    public String toString() {
+        return "First Name: " + this.firstName + " Last Name: " + this.lastName + " UserId: " + this.userId;
     }
 }

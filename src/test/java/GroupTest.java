@@ -124,8 +124,8 @@ public class GroupTest {
         if(!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
-        Query query = session.getNamedQuery("deleteGroupByName");
-        query.setParameter("group_name", testGroup.getGroupName());
+        Query query = session.getNamedQuery(Group.DELETE_GROUP_BY_NAME);
+        query.setParameter(Group.GROUP_NAME_PARAMETER, testGroup.getGroupName());
         session.beginTransaction();
         query.executeUpdate();
         session.getTransaction().commit();
@@ -136,7 +136,7 @@ public class GroupTest {
         if(!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
-        Query query = session.getNamedQuery("persistTestGroupUserMapping");
+        Query query = session.getNamedQuery(Group.PERSIST_TEST_USER_GROUP_MAPPING);
         session.beginTransaction();
         query.executeUpdate();
         session.getTransaction().commit();
@@ -147,8 +147,8 @@ public class GroupTest {
         if(!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
-        Query query = session.getNamedQuery("deleteGroupUserMapping");
-        query.setParameter("group_name", testGroup.getGroupName());
+        Query query = session.getNamedQuery(Group.DELETE_USER_GROUP_MAPPING);
+        query.setParameter(Group.GROUP_NAME_PARAMETER, testGroup.getGroupName());
         session.beginTransaction();
         query.executeUpdate();
         session.getTransaction().commit();
@@ -178,8 +178,8 @@ public class GroupTest {
     }
 
     private void deleteUsers(String userId) {
-        Query query = session.getNamedQuery("deleteUserByID");
-        query.setParameter("user_id", userId);
+        Query query = session.getNamedQuery(User.DELETE_USER_BY_USERID);
+        query.setParameter(User.USER_ID_PARAMETER, userId);
         query.executeUpdate();
     }
 }
