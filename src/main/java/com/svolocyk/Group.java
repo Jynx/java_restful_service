@@ -1,5 +1,7 @@
 package com.svolocyk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -40,11 +42,13 @@ import javax.persistence.*;
 @Table(name = "rest_group")
 public class Group {
     @Id
+    @JsonIgnore
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     @Column(name = "id")
     private int id;
 
+    @JsonProperty("group")
     @Column(name ="group_name")
     private String groupName;
 

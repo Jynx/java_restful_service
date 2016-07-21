@@ -31,6 +31,7 @@ public class UsersTest {
     @After
     public void after(){
         deleteTestUser();
+//        session.close();
     }
 
     @Test
@@ -100,6 +101,7 @@ public class UsersTest {
         persistTestUser();
         Response response =  userResource.deleteUser(testUser.getUserId());
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.OK.getReasonPhrase());
+        deleteTestUser();
     }
 
     private void persistTestUser() {
@@ -114,6 +116,7 @@ public class UsersTest {
     }
 
     private void persistGroupsForUser(User user, Session session) {
+        int batchCount = 0;
         for (Group group: user.getGroups()) {
             if(!groupExists(group.getGroupName(), session)) {
                 Group newGroup = new Group(group.getGroupName());
@@ -121,6 +124,11 @@ public class UsersTest {
             }
             UserGroupMapping mapping = new UserGroupMapping(group.getGroupName(), user.getUserId(), user.getId());
             session.save(mapping);
+            batchCount++;
+            if(batchCount % 20 == 0) {
+                session.flush();
+                session.clear();
+            }
         }
     }
 
@@ -134,36 +142,40 @@ public class UsersTest {
     }
 
     private void deleteTestUser() {
-        if(!session.isOpen()) {
+        if (!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
+        session.beginTransaction();
         deleteUser();
-        deleteGroupUserMappingsForUser();
+        deleteTestGroupUserMappingsForUser();
         deleteTestGroupsForUser();
+        session.getTransaction().commit();
     }
 
+
     private void deleteUser() {
-        session.beginTransaction();
         Query query = session.getNamedQuery("deleteUserByID");
         query.setParameter("user_id", testUser.getUserId());
         query.executeUpdate();
-        session.getTransaction().commit();
     }
 
-    private void deleteGroupUserMappingsForUser() {
-        session.beginTransaction();
+    private void deleteTestGroupUserMappingsForUser() {
         Query query = session.getNamedQuery("deleteGroupUserMappingsForUser");
-        query.setParameter("id", testUser.getId());
+        query.setParameter("id", testUser.getUserId());
         query.executeUpdate();
-        session.getTransaction().commit();
     }
 
     private void deleteTestGroupsForUser() {
+        int batchCount = 0;
         for(Group group : testUser.getGroups()) {
             Query query = session.getNamedQuery("deleteGroupByName");
             query.setParameter("group_name", group.getGroupName());
             query.executeUpdate();
-            session.getTransaction().commit();
+            batchCount++;
+            if(batchCount % 20 == 0) {
+                session.flush();
+                session.clear();
+            }
         }
     }
 }

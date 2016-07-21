@@ -1,5 +1,6 @@
 package com.svolocyk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -23,15 +24,18 @@ import javax.persistence.*;
         resultClass = User.class ),
 
     @NamedNativeQuery (
-        name = "getGroupsForUserFromMapping",
-        query = "select group_name from rest_user_group_mapping rugm where rugm.user_unique_id = :id",
-        resultClass = UserGroupMapping.class ),
+        name = "deleteGroupUserMappingsForUser",
+        query = "delete from rest_user_group_mapping rugm where rugm.user_id = :id",
+        resultClass = Group.class ),
 
     @NamedNativeQuery (
-        name = "deleteGroupUserMappingsForUser",
-        query = "delete from rest_user_group_mapping rugm where rugm.user_unique_id = :id",
+        name = "getGroupsForUserFromMapping",
+        query = "SELECT * " +
+                "FROM         rest_group rg " +
+                "INNER JOIN   rest_user_group_mapping rugm " +
+                "ON           rg.group_name = rugm.group_name " +
+                "WHERE        rugm.user_id = :id",
         resultClass = Group.class )
-
 })
 
 @Entity
@@ -50,6 +54,7 @@ public class User implements Serializable{
     private String userId;
 
     @Id
+    @JsonIgnore
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     @Column(name = "id")

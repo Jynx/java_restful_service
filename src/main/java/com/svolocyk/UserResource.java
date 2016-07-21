@@ -24,7 +24,6 @@ public class UserResource {
         }
         List<?> list = getUserListForId(session, userId);
         User user = (User)list.get(0);
-        //fix this
         List<Group> groups = getGroupsForUser(user, session);
         user.setGroups(groups);
         return Response.status(Response.Status.FOUND).entity(user).build();
@@ -42,10 +41,10 @@ public class UserResource {
         if(userExists(userId, session)) {
             return Response.status(Response.Status.CONFLICT).entity("User already exists for UserId: " + userId).build();
         }
-        user.setUserId(userId);
         session.beginTransaction();
         int id = (int)session.save(user);
         user.setId(id);
+        user.setGroups(user.getGroups());
         persistGroupsForUser(user, session);
         session.getTransaction().commit();
         session.close();
@@ -61,18 +60,14 @@ public class UserResource {
         if(!userExists(userId, session)) {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for UserId: " + userId).build();
         }
-        //clean this up? DONT DELETE GROUPS TIRED YOU
         List<?> list = getUserListForId(session, userId);
         User user = (User)list.get(0);
-        deleteGroupMappingsForUser(user, session);
-
+        deleteGroupMappingsForUser(userId, session);
         user.setFirstName(putUser.getFirstName());
         user.setLastName(putUser.getLastName());
         user.setGroups(putUser.getGroups());
         session.beginTransaction();
         session.update(user);
-
-        //fix this
         persistGroupsForUser(user, session);
         session.getTransaction().commit();
         session.close();
@@ -86,6 +81,7 @@ public class UserResource {
         if(!userExists(userId, session)) {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for UserId: " + userId).build();
         }
+        deleteGroupMappingsForUser(userId, session);
         Query query = session.getNamedQuery("deleteUserByID");
         query.setParameter("user_id", userId);
         session.beginTransaction();
@@ -97,11 +93,12 @@ public class UserResource {
 
     private List<Group> getGroupsForUser(User user, Session session) {
         Query query = session.getNamedQuery("getGroupsForUserFromMapping");
-        query.setParameter("id", user.getId());
+        query.setParameter("id", user.getUserId());
         return query.list();
     }
 
     private void persistGroupsForUser(User user, Session session) {
+        int batchCount = 0;
         for (Group group: user.getGroups()) {
             if(!groupExists(group.getGroupName(), session)) {
                 Group newGroup = new Group(group.getGroupName());
@@ -109,6 +106,11 @@ public class UserResource {
             }
             UserGroupMapping mapping = new UserGroupMapping(group.getGroupName(), user.getUserId(), user.getId());
             session.save(mapping);
+            batchCount++;
+            if(batchCount % 20 == 0) {
+                session.flush();
+                session.clear();
+            }
         }
     }
 
@@ -134,21 +136,11 @@ public class UserResource {
         return query.list();
     }
 
-    private void deleteGroupMappingsForUser(User user, Session session) {
+    private void deleteGroupMappingsForUser(String userId, Session session) {
         session.beginTransaction();
         Query query = session.getNamedQuery("deleteGroupUserMappingsForUser");
-        query.setParameter("id", user.getId());
+        query.setParameter("id", userId);
         query.executeUpdate();
         session.getTransaction().commit();
     }
-
-//    private void deleteGroupsForUser(User user, Session session) {
-//        for(Group group : user.getGroups()) {
-//            Query query = session.getNamedQuery("deleteGroupByName");
-//            query.setParameter("group_name", group.getGroupName());
-//            query.executeUpdate();
-//            session.getTransaction().commit();
-//        }
-//    }
-
 }
