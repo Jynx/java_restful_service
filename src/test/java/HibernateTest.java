@@ -1,9 +1,12 @@
+import com.svolocyk.Group;
 import com.svolocyk.HibernateUtility;
 import com.svolocyk.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -14,6 +17,7 @@ import static junit.framework.TestCase.assertNotNull;
 public class HibernateTest {
     private SessionFactory sessionFactory;
     private Session session;
+    private ArrayList<Group> groups;
 
     @Before
     public void before() {
@@ -26,7 +30,7 @@ public class HibernateTest {
 
     @Test
     public void returnsMatchingUsers() {
-        User testUser =  new User("test1", "test2", "test3");
+        User testUser =  new User("test1", "test2", "test3", groups);
         int userId1 = (int)session.save(testUser);
         testUser.setId(userId1);
         session.getTransaction().commit();
