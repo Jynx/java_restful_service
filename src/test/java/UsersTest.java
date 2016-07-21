@@ -1,12 +1,12 @@
-import com.svolocyk.HibernateUtility;
-import com.svolocyk.User;
-import com.svolocyk.UserResource;
+import com.svolocyk.*;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -16,17 +16,22 @@ public class UsersTest {
     private User testUser;
     private Session session;
     private UserResource userResource;
+    private ArrayList<Group> groups;
 
     @Before
     public void before() {
         session = HibernateUtility.getSessionFactory().openSession();
         userResource = new UserResource();
-        testUser = new User("firstName", "lastName", "fLast");
+        Group group = new Group("testGroup");
+        groups = new ArrayList();
+        groups.add(group);
+        testUser = new User("firstName", "lastName", "fLast", groups);
     }
 
     @After
     public void after(){
         deleteTestUser();
+//        session.close();
     }
 
     @Test
@@ -48,7 +53,7 @@ public class UsersTest {
     @Test
     public void testPostUserAlreadyExists() {
         persistTestUser();
-        Response response =  userResource.postUser(testUser.getUserId(), testUser);
+        Response response = userResource.postUser(testUser.getUserId(), testUser);
         deleteTestUser();
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.CONFLICT.getReasonPhrase());
     }
@@ -76,7 +81,7 @@ public class UsersTest {
     @Test
     public void testPutUserExists() {
         persistTestUser();
-        User changeUser = new User("firstNameChanged", "lastName", "fLast");
+        User changeUser = new User("firstNameChanged", "lastName", "fLast", groups);
         Response response =  userResource.putUser(testUser.getUserId(), changeUser);
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.OK.getReasonPhrase());
         User returnedUser = (User)response.getEntity();
@@ -96,6 +101,7 @@ public class UsersTest {
         persistTestUser();
         Response response =  userResource.deleteUser(testUser.getUserId());
         assertEquals(response.getStatusInfo().getReasonPhrase(), Response.Status.OK.getReasonPhrase());
+        deleteTestUser();
     }
 
     private void persistTestUser() {
@@ -103,21 +109,73 @@ public class UsersTest {
             session = HibernateUtility.getSessionFactory().openSession();
         }
         session.beginTransaction();
-        session.save(testUser);
+        int id = (int)session.save(testUser);
+        testUser.setId(id);
+        persistGroupsForUser(testUser, session);
         session.getTransaction().commit();
+    }
+
+    private void persistGroupsForUser(User user, Session session) {
+        int batchCount = 0;
+        for (Group group: user.getGroups()) {
+            if(!groupExists(group.getGroupName(), session)) {
+                Group newGroup = new Group(group.getGroupName());
+                session.save(newGroup);
+            }
+            UserGroupMapping mapping = new UserGroupMapping(group.getGroupName(), user.getUserId(), user.getId());
+            session.save(mapping);
+            batchCount++;
+            if(batchCount % 20 == 0) {
+                session.flush();
+                session.clear();
+            }
+        }
+    }
+
+    private boolean groupExists(String groupName, Session session) {
+        Query query = session.getNamedQuery("selectGroupByName");
+        query.setParameter("group_name", groupName);
+        if(query.list().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     private void deleteTestUser() {
-        if(!session.isOpen()) {
+        if (!session.isOpen()) {
             session = HibernateUtility.getSessionFactory().openSession();
         }
-        Query query = session.getNamedQuery("deleteUserByID");
-        query.setParameter("user_id", testUser.getUserId());
         session.beginTransaction();
-        query.executeUpdate();
+        deleteUser();
+        deleteTestGroupUserMappingsForUser();
+        deleteTestGroupsForUser();
         session.getTransaction().commit();
-        session.close();
     }
 
 
+    private void deleteUser() {
+        Query query = session.getNamedQuery("deleteUserByID");
+        query.setParameter("user_id", testUser.getUserId());
+        query.executeUpdate();
+    }
+
+    private void deleteTestGroupUserMappingsForUser() {
+        Query query = session.getNamedQuery("deleteGroupUserMappingsForUser");
+        query.setParameter("id", testUser.getUserId());
+        query.executeUpdate();
+    }
+
+    private void deleteTestGroupsForUser() {
+        int batchCount = 0;
+        for(Group group : testUser.getGroups()) {
+            Query query = session.getNamedQuery("deleteGroupByName");
+            query.setParameter("group_name", group.getGroupName());
+            query.executeUpdate();
+            batchCount++;
+            if(batchCount % 20 == 0) {
+                session.flush();
+                session.clear();
+            }
+        }
+    }
 }
