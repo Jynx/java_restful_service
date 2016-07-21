@@ -24,17 +24,22 @@ import javax.persistence.*;
     @NamedNativeQuery (
         name = "deleteGroupUserMapping",
         query = "delete from rest_user_group_mapping rugp where rugp.group_name = :group_name",
-        resultClass = Group.class),
+        resultClass = UserGroupMapping.class),
 
     @NamedNativeQuery (
         name = "persistTestGroupUserMapping",
         query = "insert into rest_user_group_mapping values('999', 'testGroup', 'testUser', 00)",
-        resultClass = Group.class),
+        resultClass = UserGroupMapping.class),
 
     @NamedNativeQuery (
         name = "selectGroupUserMappingByName",
         query = "select * from rest_user_group_mapping rugp where rugp.group_name = :group_name",
-        resultClass = Group.class)
+        resultClass = UserGroupMapping.class),
+
+    @NamedNativeQuery (
+        name = "checkForExistingUserAndGroupMappingByUserIdAndGroupName",
+        query = "select * from rest_user_group_mapping rugp where rugp.group_name = :group_name and rugp.user_id = :user_id",
+        resultClass = UserGroupMapping.class)
 
 })
 

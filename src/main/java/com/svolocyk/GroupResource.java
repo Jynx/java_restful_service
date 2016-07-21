@@ -6,7 +6,13 @@ import org.hibernate.query.Query;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 /**
  * Created by seven on 7/19/2016.
@@ -18,9 +24,17 @@ public class GroupResource {
     @Path("{groupName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGroup(@PathParam("groupName") String groupName) {
-        return null;
+        Session session = HibernateUtility.getSessionFactory().openSession();
+        if(!HibernateUtility.groupExists(groupName, session)) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Requested Group Does Not Exist: " + groupName).build();
+        }
+        List<UserGroupMapping> userGroupMapping = HibernateUtility.getGroupUserMappingListForName(session, groupName);
+        ArrayList<String> userIds = new ArrayList();
+        for(UserGroupMapping mapping : userGroupMapping) {
+            userIds.add(mapping.getUserId());
+        }
+        return Response.status(Response.Status.FOUND).entity(userIds).build();
     }
-
 
     @POST
     @Path("{groupName}")
@@ -28,7 +42,7 @@ public class GroupResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postGroup(@PathParam("groupName") String groupName) {
         Session session = HibernateUtility.getSessionFactory().openSession();
-        if(groupExists(groupName, session)) {
+        if(HibernateUtility.groupExists(groupName, session)) {
             return Response.status(Response.Status.CONFLICT).entity("Group already exists for groupName: " + groupName).build();
         }
         Group group = new Group(groupName);
@@ -39,12 +53,31 @@ public class GroupResource {
         return Response.status(Response.Status.CREATED).entity(group).build();
     }
 
+    @PUT
+    @Path("{groupName}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateGroupMembers(@PathParam("groupName")String groupName, String members) {
+        Session session = HibernateUtility.getSessionFactory().openSession();
+        if(!HibernateUtility.groupExists(groupName, session)) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Requested Group Does Not Exist: " + groupName).build();
+        }
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jo = (JsonObject)jsonParser.parse(members);
+        JsonArray jsonArr = jo.getAsJsonArray("members");
+        Gson googleJson = new Gson();
+        ArrayList memberList = googleJson.fromJson(jsonArr, ArrayList.class);
+        String updateSuccess = HibernateUtility.updateUserGroupMappingsForGroup(groupName, memberList, session);
+        if (!updateSuccess.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User Does Not Exist: " + updateSuccess).build();
+        }
+        return Response.status(Response.Status.OK).build();
+    }
 
     @DELETE
     @Path("{groupName}")
     public Response deleteGroupMembers(@PathParam("groupName") String groupName) {
         Session session = HibernateUtility.getSessionFactory().openSession();
-        if(!groupUserMappingExists(groupName, session)) {
+        if(!HibernateUtility.groupUserMappingExists(groupName, session)) {
             return Response.status(Response.Status.NOT_FOUND).entity("Group User Mapping does not exist for groupName: " + groupName).build();
         }
         Query query = session.getNamedQuery("deleteGroupUserMapping");
@@ -56,31 +89,7 @@ public class GroupResource {
         return Response.status(Response.Status.OK).build();
     }
 
-    private boolean groupExists(String groupName, Session session) {
-        if(!getGroupListForName(session, groupName).isEmpty()) {
-            return true;
-        }
-        return false;
-    }
 
-    private List<?> getGroupListForName(Session session, String groupName) {
-        Query query = session.getNamedQuery("selectGroupByName");
-        query.setParameter("group_name", groupName);
-        return query.list();
-    }
-
-    private boolean groupUserMappingExists(String groupName, Session session) {
-        if(!getGroupUserMappingListForName(session, groupName).isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-
-    private List<?> getGroupUserMappingListForName(Session session, String groupName) {
-        Query query = session.getNamedQuery("selectGroupUserMappingByName");
-        query.setParameter("group_name", groupName);
-        return query.list();
-    }
 
 
 }

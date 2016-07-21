@@ -118,7 +118,7 @@ public class UsersTest {
     private void persistGroupsForUser(User user, Session session) {
         int batchCount = 0;
         for (Group group: user.getGroups()) {
-            if(!groupExists(group.getGroupName(), session)) {
+            if(!HibernateUtility.groupExists(group.getGroupName(), session)) {
                 Group newGroup = new Group(group.getGroupName());
                 session.save(newGroup);
             }
@@ -130,15 +130,6 @@ public class UsersTest {
                 session.clear();
             }
         }
-    }
-
-    private boolean groupExists(String groupName, Session session) {
-        Query query = session.getNamedQuery("selectGroupByName");
-        query.setParameter("group_name", groupName);
-        if(query.list().isEmpty()) {
-            return false;
-        }
-        return true;
     }
 
     private void deleteTestUser() {
