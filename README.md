@@ -1,3 +1,30 @@
+Steven Volocyk Restful Service
+================
+
+Contents
+--------
+This example is a basic Restful web service built using Java, Maven, Glassfish, PostgreSQL, Hibernate and Jersey.
+
+The mapping of the URI path space is presented in the following table:
+
+URI path                                | Resource class      | HTTP methods                                          | Notes
+--------------------------------------- | ------------------- | ----------------------------------------------------- | --------------------------------------------------------
+**_/users/{userid}_**                   |  UserResource       |  GET, POST, PUT, DELETE                               |  Returns, Creates, Deletes, or Updates a User Record.
+**_/groups/{group name}_**              |  GroupResource      |  GET, POST, PUT, DELETE                               |  Returns a JSON list of Users, Creates, Updates, or Deletes Group records.
+
+Running the Example
+-------------------
+
+
+STATUS: App complete and functional. Refactoring now.
+
+-- Updates to come.
+
+
+
+=========================================================
+
+
 chef-starter-project
 =================
 
