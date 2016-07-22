@@ -1,3 +1,12 @@
+/*
+GroupResource basically acts as the java equivalent of a ruby on rails controller. These methods will be called and utilized
+when the URI path contains "groups", which you can see below with the @Path annotation. These annotations are part of the
+Jersey JAX-RS framework for Rest services. Anything within the class that also has a @path annotation will follow /groups/ in the URI.
+@Consume and @Produces tell the framework what to expect in the request, and what to produce as a response.
+
+Each @GET @POST etc. annotation will call the method below it when that type of request is received.
+ */
+
 package com.svolocyk;
 
 import org.hibernate.Session;

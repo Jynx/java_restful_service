@@ -1,3 +1,9 @@
+/*
+This class coresponds with the user_group_mapping table. This table is used to create a relationship between Users and Groups
+where each row in the table corresponds with a group that a user belongs to. This class is designed to create objects corresponding
+to these relationships.
+ */
+
 package com.svolocyk;
 
 import org.hibernate.annotations.GenericGenerator;

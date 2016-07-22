@@ -1,3 +1,7 @@
+/*
+User contains all information and queries for manipulating User objects.
+ */
+
 package com.svolocyk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

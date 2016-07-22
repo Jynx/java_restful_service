@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import static junit.framework.Assert.assertEquals;
 
 /**
+ * Junit Tests for Users. Will test persistence, and creation/deletion of users.
  * Created by seven on 7/19/2016.
  */
 public class UsersTest {

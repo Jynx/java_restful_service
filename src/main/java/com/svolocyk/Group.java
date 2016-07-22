@@ -1,3 +1,8 @@
+/*
+Used to map Group objects as well as provide queries that can be called to persist/delete/update Group objects in the Group table
+within the DB.
+ */
+
 package com.svolocyk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

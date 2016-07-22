@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import static junit.framework.Assert.assertEquals;
 
 /**
+ * Junit tests for Groups. Tests persitence/deletion/updates etc. of user objects to the user table.
+ * Also includes User -> group mapping tests.
  * Created by seven on 7/19/2016.
  */
 public class GroupTest {

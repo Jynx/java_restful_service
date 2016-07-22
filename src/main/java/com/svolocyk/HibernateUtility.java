@@ -1,3 +1,12 @@
+/*
+HibernateUtiltiy is the class that creates a connection between all of the main Java classes in the project
+and the database using the Hibernate API. A new session is created if one does not exists, and then utility and helper
+methods are provided for persisting/deleting any data.
+
+SessionFactory/Session is used to call the Hibernate API for persisting, updating, deleting, creating queries etc. Many of these
+utility methods are designed for checking the existence of users, groups or user to group mappings (which correspond with
+the 3 tables).
+ */
 package com.svolocyk;
 
 import org.hibernate.Session;
