@@ -107,11 +107,9 @@ Start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server
  Open hibernate.cfg.xml (src/main/resources) from root starter-jynx directory, and cofigure the DB connection. On OSX, username is
  the default username you set up the postgres owner to be, and password is empty. Make sure to change the db from restdb if you decided
  to create one using a different name.
- --------
 
 BUILD AND START
 ------------
-Run the following commands:
 
 - Install all dependencies
 ```
