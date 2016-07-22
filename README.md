@@ -16,6 +16,9 @@ when the user was persisted and associated to the user object.
 In addition, when updating member lists for groups, I opted to create new groups if those groups do not exist. However, if a user is
 included in the PUT command for updating the membership list, and that user does not exist, an error will be returned from the request.
 
+SQL-Injection is prevented when parameter-binding is used to pass parameters to queries. Hibernate will escape these parameters. All
+sql queries in this app use paramter-binding.
+
 Contents
 --------
 This example is a basic Restful web service built using Java, Maven, Glassfish, Jetty, PostgreSQL, Hibernate, JUnit (testing),
@@ -93,7 +96,7 @@ Start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server
 - Create a database named 'restdb' (this is the default db in the Hibernate configuration file) or name it anything you'd like.
   Just don't forget to update the db in the configuration file later.
 
-- Create 3 tables:
+- Create 3 tables either by using the below queries, or by executing the sql file, "table_create.sql" included in the project
 
  ```
  CREATE TABLE rest_user
