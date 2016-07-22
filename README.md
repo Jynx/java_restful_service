@@ -96,7 +96,19 @@ Start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server
 - Create a database named 'restdb' (this is the default db in the Hibernate configuration file) or name it anything you'd like.
   Just don't forget to update the db in the configuration file later.
 
-- Create 3 tables either by using the below queries, or by executing the sql file, "table_create.sql" included in the project
+- Create 3 tables either by using the below queries, by executing the sql file, "table_create.sql" included in the project, OR using liquibase.
+
+LIQUIBASE
+------------
+- Configure the liquibase.properties file to match your DB credentials. This includes username, password, and URL.
+- run the following command and confirm that the tables were created correctly:
+
+```
+mvn liquibase:update
+```
+
+CREATING MANUALLY
+------------
 
  ```
  CREATE TABLE rest_user
