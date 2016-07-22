@@ -1,6 +1,21 @@
 Steven Volocyk Restful Service
 ================
 
+Notes on Design
+--------
+After looking at the design requirements, I initially thought that userid would end up as a primary key on my user table since
+it was being passed as an id when creating a new user. However, I noticed that userid itself could have many primary key violations
+due to the many possible instances of, for example, the name jsmith. I decided to create a separate id field on my user table in order
+to allow multiple users with the same "userId" while allowing them to be uniquely identified if the project were to scale.
+This was decided in order to follow design requirements. If multiple usernames exist, you will get the first user selected from the DB
+if there exists multiple users with the same userid.
+
+If I were to change the design, I would not provide a userid on user creation, but rather a "username". The user id would be created
+when the user was persisted and associated to the user object.
+
+In addition, when updating member lists for groups, I opted to create new groups if those groups do not exist. However, if a user is
+included in the PUT command for updating the membership list, and that user does not exist, an error will be returned from the request.
+
 Contents
 --------
 This example is a basic Restful web service built using Java, Maven, Glassfish, PostgreSQL, Hibernate and Jersey.
@@ -66,7 +81,7 @@ Download the project zip. Unzip to any location.
 
 SETUP POSTGRESQL
 ------------
-IMPORTANT: You will see Unit Tests failing if a connection cannot be established to postgres.
+IMPORTANT: You will see Unit Tests failing if a connection cannot be established to postgres, or JDK is not 1.8 or higher.
 
 Start PSQL if not already started:
 ```
