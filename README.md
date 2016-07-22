@@ -18,7 +18,8 @@ included in the PUT command for updating the membership list, and that user does
 
 Contents
 --------
-This example is a basic Restful web service built using Java, Maven, Glassfish, PostgreSQL, Hibernate and Jersey.
+This example is a basic Restful web service built using Java, Maven, Glassfish, Jetty, PostgreSQL, Hibernate, JUnit (testing),
+Jackson, Gson and Jersey/JAX-RS.
 
 The mapping of the URI path space is presented in the following table:
 
