@@ -48,9 +48,80 @@ Removes all members from the named group. Should return a 404 for unknown groups
 
 SETUP
 -------------------
+-- MAC OSX --
+Install postgresql
+```
+brew install postgresql
+```
 
+If you don't have Java installed >= jdk 1.8 do the following to install jdk 1.8
+```
+brew install brew-cask
+brew cask install java
+```
 
+Download the project zip. Unzip to any location.
 
+-- Setup Postgresql --
+IMPORTANT: You will see Unit Tests failing if a connection cannot be established to postgres.
+
+Start PSQL if not already started:
+```
+start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
+```
+
+- Configure your default database (which will likely be your admin login as owner name)
+- Create a database named 'restdb' (this is the default db in the Hibernate configuration file) or name it anything you'd like.
+  Just don't forget to update the db in the configuration file later.
+
+Create 3 tables:
+
+ ```
+ CREATE TABLE rest_user
+ (
+     id integer PRIMARY KEY NOT NULL,
+     user_id varchar(50) NOT NULL,
+     first_name varchar(50) NOT NULL,
+     last_name varchar(50) NOT NULL
+ );
+
+ CREATE TABLE rest_group
+ (
+     id integer PRIMARY KEY NOT NULL,
+     group_name varchar(50) NOT NULL
+ );
+
+ CREATE TABLE rest_user_group_mapping
+ (
+     id integer PRIMARY KEY NOT NULL,
+     group_name varchar(50) NOT NULL,
+     user_id varchar(50) NOT NULL,
+     user_unique_id integer NOT NULL
+ );
+
+ ```
+
+ Open hibernate.cfg.xml (src/main/resources) from root starter-jynx directory, and cofigure the DB connection. On OSX, username is
+ the default username you set up the postgres owner to be, and password is empty. Make sure to change the db from restdb if you decided
+ to create one using a different name.
+ --------
+
+-- Building and starting server --
+Run the following commands:
+
+install all dependencies
+```
+mvn package
+```
+
+At this point you should see 18 passing tests, and some null pointers from a couple of Jars that will not impact the application running.
+
+start server
+```
+mvn jetty:run
+```
+
+Feel free to test either using curl, or postman. Happy testing!
 =========================================================
 
 
