@@ -48,7 +48,9 @@ Removes all members from the named group. Should return a 404 for unknown groups
 
 SETUP
 -------------------
--- MAC OSX --
+
+OSX SETUP
+------------
 Install postgresql
 ```
 brew install postgresql
@@ -62,19 +64,20 @@ brew cask install java
 
 Download the project zip. Unzip to any location.
 
--- Setup Postgresql --
+SETUP POSTGRESQL
+------------
 IMPORTANT: You will see Unit Tests failing if a connection cannot be established to postgres.
 
 Start PSQL if not already started:
 ```
-start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
+Start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
 ```
 
 - Configure your default database (which will likely be your admin login as owner name)
 - Create a database named 'restdb' (this is the default db in the Hibernate configuration file) or name it anything you'd like.
   Just don't forget to update the db in the configuration file later.
 
-Create 3 tables:
+- Create 3 tables:
 
  ```
  CREATE TABLE rest_user
@@ -106,22 +109,23 @@ Create 3 tables:
  to create one using a different name.
  --------
 
--- Building and starting server --
+BUILD AND START
+------------
 Run the following commands:
 
-install all dependencies
+- Install all dependencies
 ```
 mvn package
 ```
 
 At this point you should see 18 passing tests, and some null pointers from a couple of Jars that will not impact the application running.
 
-start server
+- Start server
 ```
 mvn jetty:run
 ```
-
 Feel free to test either using curl, or postman. Happy testing!
+
 =========================================================
 
 
