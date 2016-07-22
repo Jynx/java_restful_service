@@ -1,6 +1,5 @@
 --liquibase formatted sql
 --changeset codecentric-docs:release_1.create_tables.sql
-
   CREATE TABLE rest_user
   (
      id integer NOT NULL,
