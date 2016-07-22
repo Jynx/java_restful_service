@@ -101,7 +101,7 @@ Start psql : pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server
 LIQUIBASE
 ------------
 - Configure the liquibase.properties file to match your DB credentials. This includes username, password, and URL.
-- run the following command and confirm that the tables were created correctly:
+- Run the following command and confirm that the tables were created correctly:
 
 ```
 mvn liquibase:update
