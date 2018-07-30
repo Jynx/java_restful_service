@@ -5,6 +5,8 @@ Contents
 This example is a basic Restful web service built using Java, Maven, Glassfish, Jetty, PostgreSQL, Hibernate, JUnit (testing),
 Jackson, Gson and Jersey/JAX-RS.
 
+TODO: Add input validation
+
 The mapping of the URI path space is presented in the following table:
 
 URI path                                | Resource class      | HTTP methods                                          | Notes
