@@ -1,9 +1,10 @@
-Steven Volocyk Restful Service
+Steven Volocyk Restful Service -- Used as exercise to build some basic Java/API concepts at the time.
 ================
 Contents
 --------
-This example is a basic Restful web service built using Java, Maven, Glassfish, Jetty, PostgreSQL, Hibernate, JUnit (testing),
-Jackson, Gson and Jersey/JAX-RS.
+This example is a basic Restful web service built using Java, Maven, Glassfish, Jetty, PostgreSQL, Hibernate, JUnit,
+Jackson, Gson and Jersey/JAX-RS. 
+
 
 TODO: Add input validation
 
